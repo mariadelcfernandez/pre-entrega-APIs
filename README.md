@@ -9,3 +9,17 @@ Implementa fetch para interactuar con la API de FakeStore (consulta su documenta
 Aprovecha el uso de destructuring y spread para manipular los datos.
 
 Utiliza métodos de arrays y strings para separar cadenas de texto y conjuntos de información y aprovechar solo lo que necesites.
+
+// Para ejecutar terminal
+// GET - Mustra Todos los productos del servidor
+// npm run start get products
+
+// GET - MuestraUn producto por ID del servidor
+// npm run start get products/15
+
+// POST - Crear un producto en el servidor
+// npm run start post products "title" "price" "category"
+//npm run start post products 'Camisa' 58 'Ropa'
+
+// DELETE - Eliminar un producto del servidor 
+// npm run start delete products/1  
