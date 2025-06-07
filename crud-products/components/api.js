@@ -29,20 +29,64 @@ export async function createProduct({ title, price, category }) {
 
 // DELETE - Eliminar un producto del servidor
 export async function deleteProduct(productId) {
-  const getProduct = await fetch(`${API_URL}/${productId}` );
-    if (!getProduct.ok) throw new Error(`Producto ${productId} no existe`);
-        const product = await getProduct.json();
-        console.log('Eliminando el Producto :', {
-          id: product.id,
-          title: product.title,
-          price: product.price,
-          category: product.category,
-         
-  });
-    const getProducts = await fetch(`${API_URL}/${productId}`, {
-    method: 'DELETE',
-  });
-  if (!getProducts.ok) throw new Error(`Error al eliminar el producto ${productId}`);
-  return await getProducts.json();
-}
+  const getProduct = await fetch(`${API_URL}/${productId}`);
 
+  const getProducts = await fetch(`${API_URL}/${productId}`, {
+    method: 'DELETE',
+  })
+
+    //  console.log(getProducts.ok? `Producto Eliminado ${productId}`:`Error el producto  no existe`); 
+
+    .then(async response => {
+
+      if (!getProduct.ok) {
+        throw new Error(`Producto ${productId} no existe(${getProduct.status})`);
+
+      }
+      const product = await getProduct.json();
+      //  const product = await JSON.parse(await getProduct.text());
+      console.log('Eliminando el Producto :', {
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        category: product.category,
+
+      });
+
+      // Response.status Indica que la petición fue exitosa pero no hay contenido en la respuesta
+      //Si es 204, devolvemos un objeto manual indicando éxito (para evitar el error de JSON vacío
+      //response.ok: Booleano que es true para códigos 200-299 y false para el resto.
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      try {
+        // response.jsonC : Convierte el cuerpo de la respuesta de JSON a objeto JavaScript y 
+        // Solo se ejecuta si pasó las verificaciones anteriores.ata: Contiene:
+        //data El objeto manual {success: true} si fue 204
+        //El JSON parseado si había contenido
+        //Nunca llega aquí si hubo errores
+
+        const data = await response.json();
+        return data;
+      }
+      //Captura cualquier error que ocurra en la cadena:
+        //Errores de red
+        //Errores HTTP (los que lanzamos con throw)
+        //Errores de parseo JSON (aunque ya los estamos controlando)
+
+      catch (e) {
+        if (e instanceof SyntaxError && e.message.includes('Unexpected end of JSON input')) {
+          // Respuesta vacía pero exitosa
+          return { success: true };
+        }
+        throw e; // captura  otros errores como desconexion a intertenet y no llega a la api.
+      }
+    })
+    .then(data => {
+      console.log('Resultado:', data.id);
+    })
+    .catch(error => {
+      console.error('Error el producto  no existe');
+    });
+}
